@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хімічний квест: Таємниця великого хіміка</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .welcome-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            background: #f0f0f0;
+            height: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .letters-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .letter-box {
+            width: 50px;
+            height: 60px;
+            border: 3px solid #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            background: white;
+            transition: all 0.3s;
+        }
+
+        .letter-box.revealed {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            animation: letterReveal 0.5s;
+        }
+
+        @keyframes letterReveal {
+            0% { transform: rotateY(0deg); }
+            50% { transform: rotateY(90deg); }
+            100% { transform: rotateY(0deg); }
+        }
+
+        .task-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .task-title {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .task-content {
+            color: #333;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+
+        .crossword {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .crossword-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .crossword-item strong {
+            color: #667eea;
+        }
+
+        .rebus {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            font-size: 2em;
+        }
+
+        .rebus-item {
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            font-weight: bold;
+        }
+
+        .riddle {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-style: italic;
+            color: #555;
+            border-left: 4px solid #764ba2;
+            margin: 20px 0;
+        }
+
+        .answer-input {
+            margin-top: 20px;
+        }
+
+        .answer-input input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .final-screen {
+            text-align: center;
+        }
+
+        .final-screen h2 {
+            color: #667eea;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .scientist-photo {
+            width: 250px;
+            height: 300px;
+            margin: 30px auto;
+            border-radius: 15px;
+            border: 5px solid #667eea;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+        }
+
+        .biography {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .biography h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .biography p {
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .admin-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .admin-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-toggle button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .attempts {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #ffc107;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .letter-box {
+                width: 40px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const TASKS = [
+            {
+                id: 1,
+                letter: 'Б',
+                type: 'crossword',
+                title: 'Завдання 1: Хімічний кросворд',
+                questions: [
+                    { clue: '1. Метал, що використовується в термометрах', answer: 'РТУТЬ' },
+                    { clue: '2. Газ, необхідний для дихання', answer: 'КИСЕНЬ' },
+                    { clue: '3. Найлегший хімічний елемент', answer: 'ВОДЕНЬ' },
+                    { clue: '4. Метал червоного кольору, добрий провідник', answer: 'МІДЬ' }
+                ],
+                mainAnswer: 'РТУТЬ',
+                hint: 'Перша літера відповіді на перше питання'
+            },
+            {
+                id: 2,
+                letter: 'Е',
+                type: 'riddle',
+                title: 'Завдання 2: Хімічна загадка',
+                content: 'Я в повітрі є завжди, без мене не проживете. Рослини мене виділяють, а люди та тварини споживають. Хто я?',
+                answer: 'КИСЕНЬ',
+                hint: 'Друга літера цього газу'
+            },
+            {
+                id: 3,
+                letter: 'К',
+                type: 'rebus',
+                title: 'Завдання 3: Хімічний ребус',
+                content: ['Na + Cl =', '?'],
+                answer: 'СІЛЬ',
+                displayAnswer: 'NaCl',
+                hint: 'Третя літера назви речовини українською'
+            },
+            {
+                id: 4,
+                letter: 'Е',
+                type: 'riddle',
+                title: 'Завдання 4: Загадка про елемент',
+                content: 'Я металом дорогим називаюсь, в ювелірній справі використовують. Хімічний символ мій - Au, а як мене звуть?',
+                answer: 'ЗОЛОТО',
+                hint: 'Четверта літера назви цього металу'
+            },
+            {
+                id: 5,
+                letter: 'Т',
+                type: 'crossword',
+                title: 'Завдання 5: Органічна хімія',
+                questions: [
+                    { clue: '1. Найпростіший вуглеводень (метан, етан...)', answer: 'МЕТАН' },
+                    { clue: '2. Речовина, що прискорює реакцію', answer: 'КАТАЛІЗАТОР' },
+                    { clue: '3. Основа органічних сполук', answer: 'КАРБОН' },
+                ],
+                mainAnswer: 'КАТАЛІЗАТОР',
+                hint: 'Восьма літера відповіді на друге питання'
+            },
+            {
+                id: 6,
+                letter: 'О',
+                type: 'riddle',
+                title: 'Завдання 6: Хімічна властивість',
+                content: 'Цей процес відбувається з виділенням тепла та світла. Дерево перетворюється на попіл, а метан на воду та вуглекислий газ. Що це?',
+                answer: 'ГОРІННЯ',
+                hint: 'Перша літера цього процесу'
+            },
+            {
+                id: 7,
+                letter: 'В',
+                type: 'rebus',
+                title: 'Завдання 7: Формула води',
+                content: ['H₂ +', 'O₂ →', '?'],
+                answer: 'ВОДА',
+                displayAnswer: 'H₂O',
+                hint: 'Перша літера цієї речовини українською'
+            }
+        ];
+
+        function ChemistryQuest() {
+            const [stage, setStage] = useState('welcome');
+            const [studentName, setStudentName] = useState('');
+            const [studentClass, setStudentClass] = useState('9');
+            const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+            const [revealedLetters, setRevealedLetters] = useState([]);
+            const [userAnswer, setUserAnswer] = useState('');
+            const [crosswordAnswers, setCrosswordAnswers] = useState({});
+            const [feedback, setFeedback] = useState(null);
+            const [attempts, setAttempts] = useState(0);
+            const [results, setResults] = useState([]);
+            const [showAdmin, setShowAdmin] = useState(false);
+            const [adminPassword, setAdminPassword] = useState('');
+            const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+            const [passwordError, setPasswordError] = useState(false);
+
+            const ADMIN_PASSWORD = 'хімія2024'; // Пароль для доступу до панелі вчителя
+
+            useEffect(() => {
+                const savedResults = localStorage.getItem('chemistryQuestResults');
+                if (savedResults) {
+                    setResults(JSON.parse(savedResults));
+                }
+            }, []);
+
+            const saveResult = (studentData) => {
+                const newResults = [...results, studentData];
+                setResults(newResults);
+                localStorage.setItem('chemistryQuestResults', JSON.stringify(newResults));
+            };
+
+            const checkAdminPassword = () => {
+                if (adminPassword === ADMIN_PASSWORD) {
+                    setIsAdminAuthenticated(true);
+                    setShowAdmin(true);
+                    setPasswordError(false);
+                    setAdminPassword('');
+                } else {
+                    setPasswordError(true);
+                    setTimeout(() => setPasswordError(false), 2000);
+                }
+            };
+
+            const closeAdminPanel = () => {
+                setShowAdmin(false);
+                setIsAdminAuthenticated(false);
+                setAdminPassword('');
+            };
+
+            const startQuest = () => {
+                if (studentName.trim()) {
+                    setStage('quest');
+                    setAttempts(0);
+                }
+            };
+
+            const checkAnswer = () => {
+                const currentTask = TASKS[currentTaskIndex];
+                setAttempts(prev => prev + 1);
+
+                let isCorrect = false;
+
+                if (currentTask.type === 'crossword') {
+                    // Перевірка всіх відповідей кросворду
+                    isCorrect = currentTask.questions.every((q, idx) => {
+                        const userAns = (crosswordAnswers[idx] || '').trim().toUpperCase();
+                        return userAns === q.answer.toUpperCase();
+                    });
+                } else {
+                    // Для інших типів завдань
+                    const normalizedAnswer = userAnswer.trim().toUpperCase();
+                    const correctAnswer = currentTask.answer.toUpperCase();
+                    isCorrect = normalizedAnswer === correctAnswer;
+                }
+
+                if (isCorrect) {
+                    setFeedback('correct');
+                    setRevealedLetters([...revealedLetters, currentTask.letter]);
+                    
+                    setTimeout(() => {
+                        if (currentTaskIndex < TASKS.length - 1) {
+                            setCurrentTaskIndex(currentTaskIndex + 1);
+                            setUserAnswer('');
+                            setCrosswordAnswers({});
+                            setFeedback(null);
+                        } else {
+                            saveResult({
+                                name: studentName,
+                                class: studentClass,
+                                attempts: attempts + 1,
+                                completedAt: new Date().toLocaleString('uk-UA')
+                            });
+                            setStage('final');
+                        }
+                    }, 2000);
+                } else {
+                    setFeedback('incorrect');
+                    setTimeout(() => setFeedback(null), 2000);
+                }
+            };
+
+            const renderTask = () => {
+                const task = TASKS[currentTaskIndex];
+
+                return (
+                    <div className="task-container">
+                        <h2 className="task-title">{task.title}</h2>
+                        
+                        {task.type === 'crossword' && (
+                            <div className="crossword">
+                                {task.questions.map((q, idx) => (
+                                    <div key={idx} className="crossword-item">
+                                        <strong>{q.clue}</strong>
+                                        <input
+                                            type="text"
+                                            value={crosswordAnswers[idx] || ''}
+                                            onChange={(e) => setCrosswordAnswers({
+                                                ...crosswordAnswers,
+                                                [idx]: e.target.value
+                                            })}
+                                            placeholder="Введіть відповідь..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '10px',
+                                                marginTop: '10px',
+                                                border: '2px solid #ddd',
+                                                borderRadius: '6px',
+                                                fontSize: '1em'
+                                            }}
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter' && idx === task.questions.length - 1) {
+                                                    checkAnswer();
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                                <p style={{ marginTop: '15px', color: '#667eea', fontWeight: 'bold' }}>
+                                    💡 Підказка: {task.hint}
+                                </p>
+                            </div>
+                        )}
+
+                        {task.type === 'riddle' && (
+                            <div>
+                                <div className="riddle">
+                                    {task.content}
+                                </div>
+                                <p style={{ marginTop: '15px', color: '#667eea', fontWeight: 'bold' }}>
+                                    💡 Підказка: {task.hint}
+                                </p>
+                            </div>
+                        )}
+
+                        {task.type === 'rebus' && (
+                            <div>
+                                <div className="rebus">
+                                    {task.content.map((item, idx) => (
+                                        <div key={idx} className="rebus-item">{item}</div>
+                                    ))}
+                                </div>
+                                <p style={{ marginTop: '15px', color: '#667eea', fontWeight: 'bold' }}>
+                                    💡 Підказка: {task.hint}
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="answer-input">
+                            {task.type !== 'crossword' && (
+                                <input
+                                    type="text"
+                                    value={userAnswer}
+                                    onChange={(e) => setUserAnswer(e.target.value)}
+                                    placeholder="Введіть відповідь..."
+                                    onKeyPress={(e) => e.key === 'Enter' && checkAnswer()}
+                                    style={{ marginBottom: '15px' }}
+                                />
+                            )}
+                            <button className="btn" onClick={checkAnswer}>
+                                Перевірити відповідь
+                            </button>
+                        </div>
+
+                        {feedback && (
+                            <div className={`feedback ${feedback}`}>
+                                {feedback === 'correct' 
+                                    ? `✓ Правильно! Ви отримали букву "${task.letter}"` 
+                                    : '✗ Неправильно. Спробуйте ще раз!'}
+                            </div>
+                        )}
+
+                        <p style={{ marginTop: '20px', color: '#666', textAlign: 'center' }}>
+                            Кількість спроб: <strong>{attempts}</strong>
+                        </p>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>🧪 Хімічний квест</h1>
+                        <p className="subtitle">Таємниця великого українського хіміка</p>
+                    </div>
+
+                    {stage === 'welcome' && (
+                        <div className="welcome-screen">
+                            <h2>Вітаємо в хімічному квесті!</h2>
+                            <p>
+                                Вас чекають 7 захоплюючих завдань: кросворди, загадки та ребуси. 
+                                Кожне правильно виконане завдання відкриє одну літеру таємничого слова - 
+                                прізвища видатного українського хіміка.
+                            </p>
+                            <div className="input-group">
+                                <label>Прізвище та ім'я:</label>
+                                <input
+                                    type="text"
+                                    value={studentName}
+                                    onChange={(e) => setStudentName(e.target.value)}
+                                    placeholder="Іваненко Олександр"
+                                />
+                            </div>
+                            <div className="input-group">
+                                <label>Клас:</label>
+                                <select 
+                                    value={studentClass} 
+                                    onChange={(e) => setStudentClass(e.target.value)}
+                                >
+                                    <option value="9">9 клас</option>
+                                    <option value="10">10 клас</option>
+                                    <option value="11">11 клас</option>
+                                </select>
+                            </div>
+                            <button 
+                                className="btn" 
+                                onClick={startQuest}
+                                disabled={!studentName.trim()}
+                            >
+                                Розпочати квест
+                            </button>
+                        </div>
+                    )}
+
+                    {stage === 'quest' && (
+                        <>
+                            <div className="progress-bar">
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ width: `${((currentTaskIndex + 1) / TASKS.length) * 100}%` }}
+                                >
+                                    Завдання {currentTaskIndex + 1} з {TASKS.length}
+                                </div>
+                            </div>
+
+                            <div className="letters-display">
+                                {['Б', 'Е', 'К', 'Е', 'Т', 'О', 'В'].map((letter, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        className={`letter-box ${revealedLetters.includes(letter) && revealedLetters.indexOf(letter) <= idx ? 'revealed' : ''}`}
+                                    >
+                                        {revealedLetters.includes(letter) && revealedLetters.indexOf(letter) <= idx ? letter : '?'}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {renderTask()}
+                        </>
+                    )}
+
+                    {stage === 'final' && (
+                        <div className="final-screen">
+                            <h2>🎉 Вітаємо! Ви розгадали квест!</h2>
+                            
+                            <div className="letters-display" style={{ marginTop: '30px' }}>
+                                {['Б', 'Е', 'К', 'Е', 'Т', 'О', 'В'].map((letter, idx) => (
+                                    <div key={idx} className="letter-box revealed">
+                                        {letter}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="scientist-photo">
+                                👨‍🔬
+                            </div>
+
+                            <div className="biography">
+                                <h3>Микола Миколайович Бекетов (1827-1911)</h3>
+                                <p>
+                                    <strong>Видатний український хімік</strong>, засновник фізико-хімічного напрямку в хімії, 
+                                    академік Петербурзької академії наук.
+                                </p>
+                                <p>
+                                    <strong>Основні досягнення:</strong>
+                                </p>
+                                <p>
+                                    • Відкрив явище витіснення одних металів іншими з розчинів їхніх солей 
+                                    (алюмотермія - метод отримання металів відновленням їх оксидів алюмінієм)
+                                </p>
+                                <p>
+                                    • Створив вчення про окисно-відновні потенціали металів
+                                </p>
+                                <p>
+                                    • Вперше виділив кальцій електролізом
+                                </p>
+                                <p>
+                                    • Розробив теорію хімічної динаміки та хімічної механіки
+                                </p>
+                                <p>
+                                    Бекетов народився в Харкові, закінчив Харківський університет. Працював професором 
+                                    і ректором Харківського університету (1864-1865, 1876-1878). Його роботи заклали 
+                                    основи сучасної металургії та електрохімії.
+                                </p>
+                                <p style={{ marginTop: '20px', fontStyle: 'italic', color: '#667eea' }}>
+                                    <strong>Ваш результат:</strong> квест пройдено за {attempts} спроб(и)!
+                                </p>
+                            </div>
+
+                            <button 
+                                className="btn" 
+                                style={{ marginTop: '30px' }}
+                                onClick={() => window.location.reload()}
+                            >
+                                Пройти ще раз
+                            </button>
+                        </div>
+                    )}
+
+                    {stage === 'welcome' && (
+                        <div className="admin-panel">
+                            <div className="admin-toggle">
+                                {!showAdmin && (
+                                    <button onClick={() => setShowAdmin(true)}>
+                                        📊 Статистика
+                                    </button>
+                                )}
+                                {showAdmin && !isAdminAuthenticated && (
+                                    <>
+                                        <h3 style={{ marginBottom: '15px', color: '#667eea' }}>
+                                            🔐 Доступ для вчителя
+                                        </h3>
+                                        <div className="input-group" style={{ maxWidth: '400px', margin: '0 auto' }}>
+                                            <input
+                                                type="password"
+                                                value={adminPassword}
+                                                onChange={(e) => setAdminPassword(e.target.value)}
+                                                placeholder="Введіть пароль..."
+                                                onKeyPress={(e) => e.key === 'Enter' && checkAdminPassword()}
+                                                style={{ marginBottom: '10px' }}
+                                            />
+                                            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                                                <button 
+                                                    onClick={checkAdminPassword}
+                                                    style={{ 
+                                                        background: '#667eea',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '10px 20px',
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Увійти
+                                                </button>
+                                                <button 
+                                                    onClick={() => setShowAdmin(false)}
+                                                    style={{ 
+                                                        background: '#6c757d',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        padding: '10px 20px',
+                                                        borderRadius: '8px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    Скасувати
+                                                </button>
+                                            </div>
+                                            {passwordError && (
+                                                <div style={{ 
+                                                    color: '#dc3545', 
+                                                    marginTop: '10px',
+                                                    fontWeight: 'bold'
+                                                }}>
+                                                    ❌ Невірний пароль
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                                {showAdmin && isAdminAuthenticated && (
+                                    <button onClick={closeAdminPanel}>
+                                        🔒 Закрити панель вчителя
+                                    </button>
+                                )}
+                            </div>
+
+                            {showAdmin && isAdminAuthenticated && (
+                                <>
+                                    <h3 style={{ marginBottom: '20px', color: '#667eea' }}>
+                                        Результати учнів
+                                    </h3>
+
+                                    <div className="stats">
+                                        <div className="stat-card">
+                                            <h4>Всього учасників</h4>
+                                            <div className="number">{results.length}</div>
+                                        </div>
+                                        <div className="stat-card">
+                                            <h4>Середня к-ть спроб</h4>
+                                            <div className="number">
+                                                {results.length > 0 
+                                                    ? (results.reduce((sum, r) => sum + r.attempts, 0) / results.length).toFixed(1)
+                                                    : 0}
+                                            </div>
+                                        </div>
+                                        <div className="stat-card">
+                                            <h4>Найкращий результат</h4>
+                                            <div className="number">
+                                                {results.length > 0 
+                                                    ? Math.min(...results.map(r => r.attempts))
+                                                    : '-'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {results.length > 0 ? (
+                                        <table className="results-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>№</th>
+                                                    <th>ПІБ учня</th>
+                                                    <th>Клас</th>
+                                                    <th>Кількість спроб</th>
+                                                    <th>Дата проходження</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {results.map((result, idx) => (
+                                                    <tr key={idx}>
+                                                        <td>{idx + 1}</td>
+                                                        <td>{result.name}</td>
+                                                        <td>{result.class} клас</td>
+                                                        <td>
+                                                            <span className="attempts">
+                                                                {result.attempts} спроб
+                                                            </span>
+                                                        </td>
+                                                        <td>{result.completedAt}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    ) : (
+                                        <p style={{ textAlign: 'center', color: '#666', marginTop: '20px' }}>
+                                            Поки що немає результатів
+                                        </p>
+                                    )}
+
+                                    {results.length > 0 && (
+                                        <button 
+                                            className="btn" 
+                                            style={{ marginTop: '20px', background: '#dc3545' }}
+                                            onClick={() => {
+                                                if (confirm('Ви впевнені, що хочете очистити всі результати?')) {
+                                                    setResults([]);
+                                                    localStorage.removeItem('chemistryQuestResults');
+                                                }
+                                            }}
+                                        >
+                                            Очистити результати
+                                        </button>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<ChemistryQuest />, document.getElementById('root'));
+    </script>
+</body>
+</html>
